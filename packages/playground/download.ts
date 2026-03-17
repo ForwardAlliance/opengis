@@ -1,22 +1,16 @@
 import { fetchFeatures } from '@forwardalliance/opengis'
-import { saveToFile } from './utils'
+import { fs } from '@forwardalliance/opengis/cache'
 import { aed, blood, shelters } from '@forwardalliance/opengis/providers'
+import { saveToFile } from './utils'
 
+const cache = fs({ dir: '.cache' })
 const toFetch = [aed, blood, shelters]
 
 await Promise.all(
   toFetch.map(
     async (provider) =>
       await saveToFile({
-        obj: await fetchFeatures({
-          provider,
-          cache: {
-            get: async () => null,
-            clear: async () => {},
-            delete: async () => {},
-            set: async () => {},
-          },
-        }),
+        obj: await fetchFeatures({ provider, cache }),
         name: provider.id,
       }).finally(() => console.log(`${provider.id} fetched.`)),
   ),
