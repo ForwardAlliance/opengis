@@ -20,6 +20,9 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Install latest npm
+        run: npm install -g npm@latest
+
       - name: Verify versions
         run: |
           node --version
