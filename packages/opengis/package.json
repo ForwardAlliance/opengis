@@ -2,10 +2,22 @@
   "name": "@forwardalliance/opengis",
   "module": "index.ts",
   "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./providers": "./providers/index.ts"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/geojson": "^7946.0.16",
+    "@types/proj4": "^2.19.0"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@turf/turf": "^7.3.4",
+    "csv-parse": "^6.1.0",
+    "proj4": "^2.20.4",
+    "zod": "^4.3.6"
   }
 }
