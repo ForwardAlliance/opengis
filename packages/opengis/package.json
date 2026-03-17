@@ -1,17 +1,41 @@
 {
   "name": "@forwardalliance/opengis",
-  "module": "index.ts",
+  "version": "0.1.1",
   "type": "module",
-  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./index.ts",
-    "./providers": "./providers/index.ts",
-    "./cache": "./cache/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./providers": {
+      "types": "./dist/providers/index.d.ts",
+      "import": "./dist/providers/index.js"
+    },
+    "./cache": {
+      "types": "./dist/cache/index.d.ts",
+      "import": "./dist/cache/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ForwardAlliance/opengis.git",
+    "directory": "packages/opengis"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsup",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/geojson": "^7946.0.16",
-    "@types/proj4": "^2.19.0"
+    "@types/proj4": "^2.19.0",
+    "tsup": "^8.5.1"
   },
   "peerDependencies": {
     "typescript": "^5"
