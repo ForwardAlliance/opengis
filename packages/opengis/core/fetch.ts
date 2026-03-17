@@ -22,7 +22,7 @@ export async function fetchFeatures({
   await cache.set(
     cacheKey,
     { data: fetchedResult, cachedAt: new Date().getTime(), ttl },
-    86400,
+    ttl,
   )
 
   return fetchedResult
