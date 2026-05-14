@@ -1,15 +1,22 @@
 import { feature, featureCollection } from '@turf/turf'
 import { parse } from 'csv-parse/sync'
 import proj4 from 'proj4'
-import type { Provider } from '../../core/types'
+import type { ColumnMap, IdColumn, Provider } from '../../core/types'
 import { DEFAULT_CRS } from '../../core/constants'
 
 export function csv(
-  { id, url }: { id: string; url: string },
+  {
+    id,
+    url,
+    columnMap,
+    idColumn,
+  }: { id: string; url: string; columnMap?: ColumnMap; idColumn?: IdColumn },
   options: { x: string; y: string; crs?: string },
 ): Provider {
   return {
     id,
+    columnMap,
+    idColumn,
     resolve: async () => {
       const response = await fetch(url)
 
