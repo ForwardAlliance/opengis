@@ -8,6 +8,7 @@ export const aed = csv(
     id: 'AED',
     url: 'https://tw-aed.mohw.gov.tw/openData?t=csv',
     columnMap: {
+      name: '場所名稱',
       address: '場所地址',
       phone: '開放時間緊急連絡電話',
       time: (feature) => {
