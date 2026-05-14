@@ -1,10 +1,15 @@
 import { fetchFeatures } from '@forwardalliance/opengis'
 import { fs } from '@forwardalliance/opengis/cache'
-import { aed, blood, shelters } from '@forwardalliance/opengis/providers'
+import {
+  aed,
+  blood,
+  shelters,
+  airDefenseShelters,
+} from '@forwardalliance/opengis/providers'
 import { saveToFile } from './utils'
 
 const cache = fs({ dir: '.cache' })
-const toFetch = [aed, blood, shelters]
+const toFetch = [aed, blood, shelters, airDefenseShelters]
 
 await Promise.all(
   toFetch.map(
