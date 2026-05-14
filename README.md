@@ -1,4 +1,4 @@
-# forward-opengis
+# @forwardalliance/opengis
 
 ## Commands
 
