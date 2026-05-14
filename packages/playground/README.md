@@ -1,15 +1,10 @@
 # playground
 
-To install dependencies:
+Local Bun scripts for downloading provider output.
 
 ```bash
-bun install
+pnpm install
+pnpm --filter playground exec bun download.ts
 ```
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.10. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Outputs GeoJSON files to `data/*.geojson` and cache files to `.cache`.

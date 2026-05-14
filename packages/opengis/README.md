@@ -1,15 +1,36 @@
-# opengis
+# @forwardalliance/opengis
 
-To install dependencies:
+ESM TypeScript package for fetching provider data as GeoJSON.
 
-```bash
-bun install
-```
-
-To run:
+## Install
 
 ```bash
-bun run index.ts
+pnpm add @forwardalliance/opengis
 ```
 
-This project was created using `bun init` in bun v1.3.10. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## Usage
+
+```ts
+import { fetchFeatures } from '@forwardalliance/opengis'
+import { memory } from '@forwardalliance/opengis/cache'
+import { aed } from '@forwardalliance/opengis/providers'
+
+const features = await fetchFeatures({
+  provider: aed,
+  cache: memory(),
+})
+```
+
+## Exports
+
+- `@forwardalliance/opengis`
+- `@forwardalliance/opengis/providers`
+- `@forwardalliance/opengis/cache`
+
+## Development
+
+```bash
+pnpm --filter @forwardalliance/opengis typecheck
+pnpm --filter @forwardalliance/opengis build
+pnpm --filter @forwardalliance/opengis dev
+```
