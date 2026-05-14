@@ -1,8 +1,5 @@
 {
-  "name": "workspaces",
-  "workspaces": [
-    "packages/*"
-  ],
+  "name": "forward-alliance-opengis",
   "devDependencies": {
     "@types/xmldom": "^0.1.34",
     "prettier": "^3.8.1"
