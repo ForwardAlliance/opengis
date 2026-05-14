@@ -1,5 +1,56 @@
 import { DEFAULT_TTL } from './constants'
-import { type CacheProvider, type Provider } from './types'
+import {
+  type CacheProvider,
+  type ColumnMap,
+  type Features,
+  type IdColumn,
+  type Provider,
+} from './types'
+
+function applyOutputConfig(
+  features: Features,
+  {
+    columnMap,
+    idColumn,
+  }: {
+    columnMap?: ColumnMap
+    idColumn?: IdColumn
+  },
+) {
+  if (!columnMap && !idColumn) {
+    return features
+  }
+
+  return {
+    ...features,
+    features: features.features.map((feature) => {
+      if (!feature.properties) {
+        return feature
+      }
+
+      const properties = { ...feature.properties }
+      const id =
+        typeof idColumn === 'function'
+          ? idColumn(feature.properties)
+          : idColumn
+            ? feature.properties[idColumn]
+            : feature.id
+
+      for (const [key, value] of Object.entries(columnMap ?? {})) {
+        properties[key] =
+          typeof value === 'function'
+            ? value(feature.properties)
+            : feature.properties[value]
+      }
+
+      return {
+        ...feature,
+        id,
+        properties,
+      }
+    }),
+  } satisfies Features
+}
 
 export async function fetchFeatures({
   provider,
@@ -14,7 +65,7 @@ export async function fetchFeatures({
   const cachedResult = await cache.get(cacheKey)
 
   if (cachedResult) {
-    return cachedResult.data
+    return applyOutputConfig(cachedResult.data, provider)
   }
 
   const fetchedResult = await provider.resolve()
@@ -25,5 +76,5 @@ export async function fetchFeatures({
     ttl,
   )
 
-  return fetchedResult
+  return applyOutputConfig(fetchedResult, provider)
 }

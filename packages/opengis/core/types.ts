@@ -1,10 +1,17 @@
-import type { AllGeoJSON } from '@turf/turf'
+import type { FeatureCollection } from 'geojson'
 
-export type Features = AllGeoJSON
+export type Features = FeatureCollection
+export type ColumnMap = Record<
+  string,
+  string | ((feature: Record<any, any>) => string)
+>
+export type IdColumn = string | ((feature: Record<any, any>) => string)
 
 export type Provider = {
   id: string
   resolve: () => Promise<Features>
+  columnMap?: ColumnMap
+  idColumn?: IdColumn
 }
 
 export interface CacheEntry {
