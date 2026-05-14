@@ -27,9 +27,10 @@
     "directory": "packages/opengis"
   },
   "scripts": {
+    "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "build": "tsup",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@types/bun": "latest",
