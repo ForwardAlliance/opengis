@@ -3,7 +3,11 @@ import { featureCollection } from '@turf/turf'
 
 export function getStringProperty(feature: Record<any, any>, key: string) {
   const value = feature?.[key]
-  return typeof value === 'string' && value.trim() ? value : null
+  return typeof value === 'string' && value.trim()
+    ? value === ''
+      ? null
+      : value
+    : null
 }
 
 export function join<PreprocessingData>({

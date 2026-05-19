@@ -24,8 +24,8 @@ export const aed = csv(
 三：${monToFriFrom}-${monToFriTo}
 四：${monToFriFrom}-${monToFriTo}
 五：${monToFriFrom}-${monToFriTo}
-六：${satFrom === '' ? '休' : `${satFrom}-${satTo}`}
-日：${sunFrom === '' ? '休' : `${sunFrom}-${sunTo}`}`
+六：${!satFrom ? '無' : `${satFrom}-${satTo}`}
+日：${!sunFrom ? '無' : `${sunFrom}-${sunTo}`}`
       },
     },
     idColumn: 'AEDID',
