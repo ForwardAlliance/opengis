@@ -1,5 +1,11 @@
 # @forwardalliance/opengis
 
+## 1.0.3
+
+### Patch Changes
+
+- 7985f91: fix aed weekday time null value
+
 ## 1.0.2
 
 ### Patch Changes
