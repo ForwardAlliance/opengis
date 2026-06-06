@@ -1,5 +1,11 @@
 # @forwardalliance/opengis
 
+## 1.0.6
+
+### Patch Changes
+
+- 4735f43: Fix blood.org.tw provider CSRF handling and upstream response validation.
+
 ## 1.0.5
 
 ### Patch Changes
