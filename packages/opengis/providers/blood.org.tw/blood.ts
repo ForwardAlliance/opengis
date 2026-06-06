@@ -91,4 +91,13 @@ export const blood: Provider = {
       ),
     )
   },
+  idColumn(feature) {
+    return feature.SId.Value
+  },
+  columnMap: {
+    name: 'ActivityName',
+    description: 'ActivityPlaceDesc',
+    address: 'ActivityPlace',
+    time: (point) => `${point.DonationDate} ${point.DonationTime}`,
+  },
 }
