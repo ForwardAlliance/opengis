@@ -1,5 +1,11 @@
 # @forwardalliance/opengis
 
+## 1.0.5
+
+### Patch Changes
+
+- f1e414c: feat(opengis/blood): add id and column map
+
 ## 1.0.4
 
 ### Patch Changes
