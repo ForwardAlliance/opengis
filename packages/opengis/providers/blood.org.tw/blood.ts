@@ -36,50 +36,156 @@ const featuresSchema = z.array(
   }),
 )
 
+const browserHeaders = {
+  Accept:
+    'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+}
+
+function getHtmlTitle(html: string) {
+  return html.match(/<title[^>]*>(.*?)<\/title>/is)?.[1]?.trim()
+}
+
+function getHtmlSnippet(html: string) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 240)
+}
+
+function describeResponse(response: Response, html: string) {
+  const title = getHtmlTitle(html)
+  const snippet = getHtmlSnippet(html)
+  return [
+    `status ${response.status} ${response.statusText}`.trim(),
+    title ? `title: ${title}` : undefined,
+    snippet ? `body: ${snippet}` : undefined,
+  ]
+    .filter(Boolean)
+    .join(', ')
+}
+
+function getCookieHeader(setCookieHeader: string | null) {
+  return setCookieHeader
+    ?.split(/,(?=\s*[^;,]+=)/)
+    .map((cookie) => cookie.split(';')[0]?.trim())
+    .filter(Boolean)
+    .join('; ')
+}
+
+function requireMatch(
+  value: string | undefined,
+  name: string,
+  response: Response,
+  html: string,
+) {
+  if (!value) {
+    throw new Error(
+      `blood.org.tw did not return ${name}; received ${describeResponse(response, html)}`,
+    )
+  }
+
+  return value
+}
+
 export const blood: Provider = {
   id: 'blood',
   resolve: async () => {
     const url = 'https://www.blood.org.tw/xcevent'
 
-    const initialResponse = await fetch(url)
+    const initialResponse = await fetch(url, {
+      headers: browserHeaders,
+    })
     const initialHtml = await initialResponse.text()
+    if (!initialResponse.ok) {
+      throw new Error(
+        `blood.org.tw initial request failed; received ${describeResponse(initialResponse, initialHtml)}`,
+      )
+    }
 
     // ASP.NET anti-forgery uses a cookie+form token pair that must come from the same page load
     const cookieHeader = initialResponse.headers.get('set-cookie')
     const cookieTokenMatch = cookieHeader?.match(
       /__RequestVerificationToken=([^;]+)/,
     )
-    const cookieToken = cookieTokenMatch?.[1]
+    requireMatch(
+      cookieTokenMatch?.[1],
+      'CSRF cookie token',
+      initialResponse,
+      initialHtml,
+    )
+    const cookies = requireMatch(
+      getCookieHeader(cookieHeader),
+      'response cookies',
+      initialResponse,
+      initialHtml,
+    )
 
     const formTokenMatch = initialHtml.match(
       /name="__RequestVerificationToken"[^>]*value="([^"]*)"/,
     )
-    const formToken = formTokenMatch?.[1]
+    const formToken = requireMatch(
+      formTokenMatch?.[1],
+      'CSRF form token',
+      initialResponse,
+      initialHtml,
+    )
 
     const condsSIdMatch = initialHtml.match(
       /name="CondsSId"[^>]*value="([^"]*)"/,
     )
-    const condsSId = condsSIdMatch?.[1]
+    const condsSId = requireMatch(
+      condsSIdMatch?.[1],
+      'CondsSId form value',
+      initialResponse,
+      initialHtml,
+    )
 
     const today = new Date()
-    const donationDateBegin = encodeURIComponent(
-      `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`,
-    )
+    const donationDateBegin =
+      `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`
+
+    const body = new URLSearchParams({
+      __RequestVerificationToken: formToken,
+      XsmSId: '',
+      CondsSId: condsSId,
+      ExecAction: '',
+      IndexOfPages: '0',
+      DonationDateBegin: donationDateBegin,
+      DonationDateEnd: '',
+      City: '',
+      Display: 'Y',
+      SearchEventKeyword: '',
+      EventTypeValue: '',
+      PageSize: '50',
+    })
 
     const response = await fetch(url, {
       headers: {
+        ...browserHeaders,
         'content-type': 'application/x-www-form-urlencoded',
-        cookie: `__RequestVerificationToken=${cookieToken}; FSize=M`,
+        cookie: `${cookies}; FSize=M`,
         Referer: url,
       },
       method: 'POST',
-      body: `__RequestVerificationToken=${formToken}&XsmSId=&CondsSId=${condsSId}&ExecAction=&IndexOfPages=0&DonationDateBegin=${donationDateBegin}&DonationDateEnd=&City=&Display=Y&SearchEventKeyword=&EventTypeValue=&PageSize=50`,
+      body,
     })
     const html = await response.text()
+    if (!response.ok) {
+      throw new Error(
+        `blood.org.tw data request failed; received ${describeResponse(response, html)}`,
+      )
+    }
 
     const regex = /var\s+Data\s*=\s*(.+?);/
     const match = html.match(regex)
-    const content = JSON.parse(match?.[1] ?? '')
+    const data = requireMatch(match?.[1], 'Data payload', response, html)
+    const content = JSON.parse(data)
     const points = featuresSchema.parse(content)
 
     return featureCollection(
