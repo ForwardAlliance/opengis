@@ -19,13 +19,14 @@ export const aed = csv(
         const sunFrom = getStringProperty(feature, '周日起')
         const sunTo = getStringProperty(feature, '周日迄')
 
-        return `一：${monToFriFrom}-${monToFriTo}
-二：${monToFriFrom}-${monToFriTo}
-三：${monToFriFrom}-${monToFriTo}
-四：${monToFriFrom}-${monToFriTo}
-五：${monToFriFrom}-${monToFriTo}
-六：${!satFrom ? '無' : `${satFrom ?? ''}-${satTo ?? ''}`}
-日：${!sunFrom ? '無' : `${sunFrom ?? ''}-${sunTo ?? ''}`}`
+
+        return `一：${!monToFriFrom ? '無' : `${monToFriFrom}-${monToFriTo}`}
+二：${!monToFriFrom ? '無' : `${monToFriFrom}-${monToFriTo}`}
+三：${!monToFriFrom ? '無' : `${monToFriFrom}-${monToFriTo}`}
+四：${!monToFriFrom ? '無' : `${monToFriFrom}-${monToFriTo}`}
+五：${!monToFriFrom ? '無' : `${monToFriFrom}-${monToFriTo}`}
+六：${!satFrom ? '無' : `${satFrom}-${satTo}`}
+日：${!sunFrom ? '無' : `${sunFrom}-${sunTo}`}`
       },
     },
     idColumn: 'AEDID',
