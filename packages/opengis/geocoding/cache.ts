@@ -22,22 +22,27 @@ export function memoryGeocodeCache(): GeocodeCache {
  */
 export function fsGeocodeCache({ path }: { path: string }): GeocodeCache {
   let map: Map<string, LngLat | null> | null = null
+  let loadPromise: Promise<Map<string, LngLat | null>> | null = null
   let dirty = false
 
-  const load = async () => {
+  const load = () => {
     if (map) {
+      return Promise.resolve(map)
+    }
+    // Memoize the in-flight read so concurrent get/set calls don't each hit disk.
+    loadPromise ??= (async () => {
+      try {
+        const parsed = JSON.parse(await readFile(path, 'utf-8')) as Record<
+          string,
+          LngLat | null
+        >
+        map = new Map(Object.entries(parsed))
+      } catch {
+        map = new Map()
+      }
       return map
-    }
-    try {
-      const parsed = JSON.parse(await readFile(path, 'utf-8')) as Record<
-        string,
-        LngLat | null
-      >
-      map = new Map(Object.entries(parsed))
-    } catch {
-      map = new Map()
-    }
-    return map
+    })()
+    return loadPromise
   }
 
   return {

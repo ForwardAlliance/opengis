@@ -40,8 +40,11 @@ export function medicalInstitutions({
     },
     resolve: async () => {
       const records = await fetchOdsRecords(SOURCE_URL)
+      // Taiwan open data mixes 台/臺 (e.g. 台北市 vs 臺北市); normalize both sides.
+      const normalize = (value: string) => value.replace(/台/g, '臺')
+      const target = county ? normalize(county) : ''
       const scoped = county
-        ? records.filter((r) => (r['縣市區名'] ?? '').startsWith(county))
+        ? records.filter((r) => normalize(r['縣市區名'] ?? '').startsWith(target))
         : records
 
       const coordsByAddress = await geocodeAll(

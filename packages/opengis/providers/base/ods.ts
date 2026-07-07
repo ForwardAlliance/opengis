@@ -80,6 +80,13 @@ export async function fetchOdsRecords(
     if (!inSheet) {
       return
     }
+    // Separate paragraphs within a cell so multi-line values (multiple
+    // <text:p>) aren't concatenated into one run; the trailing newline is
+    // removed by the trim() when the cell closes.
+    if (tag.name === 'text:p' && inCell) {
+      cellText += '\n'
+      return
+    }
     if (CELL_TAGS.has(tag.name) && inCell) {
       inCell = false
       const trimmed = cellText.trim()
