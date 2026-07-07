@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'index.ts',
     'providers/index': 'providers/index.ts',
     'cache/index': 'cache/index.ts',
+    'geocoding/index': 'geocoding/index.ts',
   },
   format: ['esm'],
   dts: true,
