@@ -43,3 +43,5 @@ Make sure every provider has these keys mapped (if avaliable) to show metadata p
 - `address`: `string`
 - `phone`: `string`, this could be a general "contact info" text.
 - `time`: `string` this could be a multiline text describing time opened for the location
+- `description`: `string`, free-form text describing the location.
+- `imageURL`: `string`, a link to a live image/video stream for the location (e.g. a CCTV feed).
