@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync'
+import { unzipSync } from 'fflate'
 import type { ColumnMap, IdColumn, Provider } from '../../core/types'
-import { pointFeatures } from './points'
+import { pointFeatures, type Bbox } from './points'
 
 export function csv(
   {
@@ -9,14 +10,17 @@ export function csv(
     columnMap,
     idColumn,
     encoding,
+    zipEntry,
   }: {
     id: string
     url: string
     columnMap?: ColumnMap
     idColumn?: IdColumn
     encoding?: string
+    /** If the URL returns a zip, the entry to read from it (name or matcher). */
+    zipEntry?: string | RegExp
   },
-  options: { x: string; y: string; crs?: string },
+  options: { x: string; y: string; crs?: string; bbox?: Bbox | null },
 ): Provider {
   return {
     id,
@@ -29,8 +33,24 @@ export function csv(
         throw new Error()
       }
 
-      const buffer = await response.arrayBuffer()
-      const text = new TextDecoder(encoding ?? 'utf-8').decode(buffer)
+      let bytes = new Uint8Array(await response.arrayBuffer())
+
+      if (zipEntry) {
+        const files = unzipSync(bytes)
+        const name = Object.keys(files).find((entry) =>
+          typeof zipEntry === 'string'
+            ? entry === zipEntry
+            : // match() avoids the stateful lastIndex pitfall of a global RegExp.test().
+              entry.match(zipEntry) !== null,
+        )
+        const entry = name ? files[name] : undefined
+        if (!entry) {
+          throw new Error(`No zip entry matching ${zipEntry} in ${id}`)
+        }
+        bytes = entry
+      }
+
+      const text = new TextDecoder(encoding ?? 'utf-8').decode(bytes)
 
       const records = parse(text, {
         // Some source files have trailing blank headers; give them unique
