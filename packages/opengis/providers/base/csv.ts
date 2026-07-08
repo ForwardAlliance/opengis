@@ -38,7 +38,10 @@ export function csv(
       if (zipEntry) {
         const files = unzipSync(bytes)
         const name = Object.keys(files).find((entry) =>
-          typeof zipEntry === 'string' ? entry === zipEntry : zipEntry.test(entry),
+          typeof zipEntry === 'string'
+            ? entry === zipEntry
+            : // match() avoids the stateful lastIndex pitfall of a global RegExp.test().
+              entry.match(zipEntry) !== null,
         )
         const entry = name ? files[name] : undefined
         if (!entry) {

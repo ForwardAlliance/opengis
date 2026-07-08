@@ -54,6 +54,11 @@ export function pointFeatures(
       }))
       .filter(({ coords }) => {
         const [lng = 0, lat = 0] = coords
+        // Reprojection can still yield NaN; guard again so it can't leak into
+        // the output as [null, null] when bbox is disabled.
+        if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+          return false
+        }
         // No Taiwan point sits on a 0 lng/lat; a 0 means a missing/blank source
         // value. Checked independently of bbox so it holds even when disabled.
         if (lng === 0 || lat === 0) {
