@@ -1,6 +1,6 @@
 import { DOMParser } from 'xmldom'
 import type { ColumnMap, IdColumn, Provider } from '../../core/types'
-import { pointFeatures } from './points'
+import { pointFeatures, type Bbox } from './points'
 
 // Flatten an element into a `{ tag: text }` record. Nested wrapper elements
 // (e.g. MOTC's <RoadSection><Start/><End/>) are merged up so their leaf tags
@@ -51,7 +51,7 @@ export function xml(
     idColumn?: IdColumn
     encoding?: string
   },
-  options: { x: string; y: string; crs?: string },
+  options: { x: string; y: string; crs?: string; bbox?: Bbox | null },
 ): Provider {
   return {
     id,
