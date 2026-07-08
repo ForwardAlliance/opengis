@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync'
 import { unzipSync } from 'fflate'
 import type { ColumnMap, IdColumn, Provider } from '../../core/types'
+import { fetchBytes } from './http'
 import { pointFeatures, type Bbox } from './points'
 
 export function csv(
@@ -11,6 +12,7 @@ export function csv(
     idColumn,
     encoding,
     zipEntry,
+    insecureTLS,
   }: {
     id: string
     url: string
@@ -19,6 +21,8 @@ export function csv(
     encoding?: string
     /** If the URL returns a zip, the entry to read from it (name or matcher). */
     zipEntry?: string | RegExp
+    /** Skip TLS verification for this request only (servers missing an intermediate cert). */
+    insecureTLS?: boolean
   },
   options: { x: string; y: string; crs?: string; bbox?: Bbox | null },
 ): Provider {
@@ -27,13 +31,7 @@ export function csv(
     columnMap,
     idColumn,
     resolve: async () => {
-      const response = await fetch(url)
-
-      if (!response.ok) {
-        throw new Error()
-      }
-
-      let bytes = new Uint8Array(await response.arrayBuffer())
+      let bytes = await fetchBytes(url, { insecureTLS })
 
       if (zipEntry) {
         const files = unzipSync(bytes)
