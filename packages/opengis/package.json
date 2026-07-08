@@ -16,6 +16,10 @@
     "./cache": {
       "types": "./dist/cache/index.d.ts",
       "import": "./dist/cache/index.js"
+    },
+    "./geocoding": {
+      "types": "./dist/geocoding/index.d.ts",
+      "import": "./dist/geocoding/index.js"
     }
   },
   "files": [
@@ -47,7 +51,9 @@
   "dependencies": {
     "@turf/turf": "^7.3.4",
     "csv-parse": "^6.1.0",
+    "fflate": "^0.8.3",
     "proj4": "^2.20.4",
+    "saxes": "^6.0.0",
     "zod": "^4.3.6"
   }
 }
