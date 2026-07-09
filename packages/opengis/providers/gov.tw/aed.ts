@@ -1,12 +1,13 @@
 import { csv } from '../base/csv'
 import { getStringProperty } from '../utils'
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
 export const aed = csv(
   {
     id: 'AED',
     url: 'https://tw-aed.mohw.gov.tw/openData?t=csv',
+    // Server omits its intermediate certificate; skip verification for this
+    // request only rather than disabling TLS for the whole process.
+    insecureTLS: true,
     columnMap: {
       name: '場所名稱',
       address: '場所地址',
