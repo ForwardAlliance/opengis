@@ -1,5 +1,19 @@
 # @forwardalliance/opengis
 
+## 1.2.0
+
+### Minor Changes
+
+- c4e7f84: Stable feature ids and a geocoder request timeout (integration feedback).
+  - `police`, `fireStations`, and `disasterResponseCenters` now set an `idColumn` keyed on name + address, so features carry a stable, unique id for downstream upserts (police unit names alone collide across cities).
+  - `createArcgis` accepts a `timeout` option (default 10s); each geocode request is bounded by `AbortSignal.timeout`, and a timeout/error resolves the address to `null` instead of stalling the batch.
+
+### Patch Changes
+
+- c10e5d7: Security: stop disabling TLS verification process-wide.
+
+  The `aed` provider set `NODE_TLS_REJECT_UNAUTHORIZED=0` at import time, which turned off certificate verification for every HTTPS request in the host process just by importing `@forwardalliance/opengis/providers`. The AED server omits its intermediate certificate; that workaround is now scoped to the single AED request via a dedicated `https.Agent` (new `insecureTLS` option on the `csv()` base), leaving global TLS verification intact.
+
 ## 1.1.0
 
 ### Minor Changes
