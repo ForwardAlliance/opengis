@@ -15,6 +15,10 @@ export const police = csv(
     // The URL returns a zip whose CSV filename is date-stamped, so match by pattern.
     url: 'https://www.tgos.tw/tgos/VirtualDir/Product/9927eb8a-efed-40c0-8bc4-83121ad6834a/1150629.zip',
     zipEntry: /PoliceAddress.*\.csv$/,
+    // No id column in the source, and unit names repeat across cities, so key
+    // on name + address (unique and stable) for downstream upserts.
+    idColumn: (feature) =>
+      `${(feature['中文單位名稱'] ?? '').trim()}|${(feature['地址'] ?? '').trim()}`,
     columnMap: {
       name: '中文單位名稱',
       address: '地址',
