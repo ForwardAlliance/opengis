@@ -7,7 +7,8 @@ export const fireStations = csv(
     encoding: 'big5',
     // No id column in the source; key on name + address (unique and stable) for
     // downstream upserts.
-    idColumn: (feature) => `${feature['消防隊名稱'] ?? ''}|${feature['地址'] ?? ''}`,
+    idColumn: (feature) =>
+      `${(feature['消防隊名稱'] ?? '').trim()}|${(feature['地址'] ?? '').trim()}`,
     columnMap: {
       name: '消防隊名稱',
       address: '地址',

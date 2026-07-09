@@ -28,8 +28,15 @@ export function createArcgis({
       url.searchParams.set('maxLocations', '1')
       url.searchParams.set('outFields', 'Score')
 
+      // Degrade gracefully if the runtime lacks AbortSignal.timeout, rather
+      // than letting it throw and silently resolve every address to null.
+      const signal =
+        typeof AbortSignal.timeout === 'function'
+          ? AbortSignal.timeout(timeout)
+          : undefined
+
       try {
-        const response = await fetch(url, { signal: AbortSignal.timeout(timeout) })
+        const response = await fetch(url, { signal })
         if (!response.ok) {
           return null
         }

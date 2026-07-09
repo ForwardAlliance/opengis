@@ -17,7 +17,8 @@ export const police = csv(
     zipEntry: /PoliceAddress.*\.csv$/,
     // No id column in the source, and unit names repeat across cities, so key
     // on name + address (unique and stable) for downstream upserts.
-    idColumn: (feature) => `${feature['中文單位名稱'] ?? ''}|${feature['地址'] ?? ''}`,
+    idColumn: (feature) =>
+      `${(feature['中文單位名稱'] ?? '').trim()}|${(feature['地址'] ?? '').trim()}`,
     columnMap: {
       name: '中文單位名稱',
       address: '地址',
